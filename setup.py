@@ -65,7 +65,7 @@ def findPackages(path, dataExclude=[]):
     return packages, package_data
 
 
-long_description = file("README.txt").read()
+long_description = open("README.txt").read()
 packages, package_data = findPackages("libpathod")
 setup(
         name = "pathod",
@@ -89,5 +89,6 @@ setup(
             "Topic :: Software Development :: Testing :: Traffic Generation",
             "Topic :: Internet :: WWW/HTTP",
         ],
-        install_requires=['netlib>=0.2.2', "requests>=1.0.4", "flask"],
+        install_requires=['netlib>=0.2.2', "requests>=1.0.4", "flask",
+                          "six"],
 )

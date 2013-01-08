@@ -1,12 +1,14 @@
-import json, cStringIO
-from libpathod import pathoc, test, version
+import json
 import tutils
+from six.moves import cStringIO
+import libpathod.pathoc as pathoc
+import libpathod
 
 
 class _TestDaemon:
     @classmethod
     def setUpAll(self):
-        self.d = test.Daemon(
+        self.d = libpathoc.test.Daemon(
             ssl=self.ssl,
             staticdir=tutils.test_data.path("data"),
             anchors=[("/anchor/.*", "202")]
@@ -27,7 +29,7 @@ class _TestDaemon:
         )
         c.connect()
         _, _, _, _, content = c.request("get:/api/info")
-        assert tuple(json.loads(content)["version"]) == version.IVERSION
+        assert tuple(json.loads(content)["version"]) == libpathoc.version.IVERSION
 
 
 class TestDaemonSSL(_TestDaemon):

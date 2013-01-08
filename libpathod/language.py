@@ -1,10 +1,11 @@
 import operator, string, random, mmap, os, time, copy
 import abc
 from email.utils import formatdate
-import contrib.pyparsing as pp
+import libpathod.contrib.pyparsing as pp
 from netlib import http_status, tcp, http_uastrings
 
-import utils
+import libpathod.utils as utils
+from six.moves import reduce
 
 BLOCKSIZE = 1024
 TRUNCATE = 1024
@@ -969,7 +970,7 @@ def parse_response(settings, s):
         s = read_file(settings, s)
     try:
         return Response(Response.expr().parseString(s, parseAll=True))
-    except pp.ParseException, v:
+    except pp.ParseException as v:
         raise ParseException(v.msg, v.line, v.col)
 
 
@@ -985,5 +986,5 @@ def parse_request(settings, s):
         s = read_file(settings, s)
     try:
         return Request(Request.expr().parseString(s, parseAll=True))
-    except pp.ParseException, v:
+    except pp.ParseException as v:
         raise ParseException(v.msg, v.line, v.col)

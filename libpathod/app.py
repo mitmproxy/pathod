@@ -1,7 +1,10 @@
-import logging, pprint, cStringIO
+import logging, pprint
 from flask import Flask, jsonify, render_template, request, abort, make_response
-import version, language, utils
 from netlib import http_uastrings
+from six.moves import cStringIO
+import libpathod.language as language
+import libpathod.utils as utils
+import libpathod.version as version
 
 logging.basicConfig(level="DEBUG")
 app = Flask(__name__)
@@ -119,7 +122,7 @@ def _preview(is_request):
             r = language.parse_request(app.config["pathod"].request_settings, spec)
         else:
             r = language.parse_response(app.config["pathod"].request_settings, spec)
-    except language.ParseException, v:
+    except language.ParseException as v:
         args["syntaxerror"] = str(v)
         args["marked"] = v.marked()
         return render(template, False, **args)

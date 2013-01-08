@@ -1,6 +1,8 @@
-import os, cStringIO
-from libpathod import language, utils
+import os
 import tutils
+from six.moves import cStringIO
+import libpathod.language as language
+import libpathod.utils
 
 language.TESTING = True
 
@@ -673,7 +675,7 @@ class TestResponse:
         tutils.raises(language.ParseException, language.parse_response, {}, "400:msg,b:")
         try:
             language.parse_response({}, "400'msg':b:")
-        except language.ParseException, v:
+        except language.ParseException as v:
             assert v.marked()
             assert str(v)
 
@@ -682,7 +684,7 @@ class TestResponse:
 
     def test_parse_header(self):
         r = language.parse_response({}, '400:h"foo"="bar"')
-        assert utils.get_header("foo", r.headers)
+        assert libpathod.utils.get_header("foo", r.headers)
 
     def test_parse_pause_before(self):
         r = language.parse_response({}, "400:p0,10")

@@ -139,10 +139,11 @@ else:
 
 # build list of single arg builtins, tolerant of Python version, that can be used as parse actions
 singleArgBuiltins = []
-import __builtin__
+from six.moves import builtins
+
 for fname in "sum len enumerate sorted reversed list tuple set any all".split():
     try:
-        singleArgBuiltins.append(getattr(__builtin__,fname))
+        singleArgBuiltins.append(getattr(builtins,fname))
     except AttributeError:
         continue
 
@@ -681,15 +682,15 @@ if not _PY3K:
         return wrapper
 else:
     def _trim_arity(func, maxargs=2):
-        limit = maxargs
+        d = {'limit': maxargs}
         def wrapper(*args):
             #~ nonlocal limit
             while 1:
                 try:
-                    return func(*args[limit:])
+                    return func(*args[d['limit']:])
                 except TypeError:
-                    if limit:
-                        limit -= 1
+                    if d['limit']:
+                        d['limit'] -= 1
                         continue
                     raise
         return wrapper
@@ -2477,7 +2478,7 @@ class MatchFirst(ParseExpression):
             try:
                 ret = e._parse( instring, loc, doActions )
                 return ret
-            except ParseException, err:
+            except ParseException as err:
                 if err.loc > maxExcLoc:
                     maxException = err
                     maxExcLoc = err.loc

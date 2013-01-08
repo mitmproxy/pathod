@@ -1,7 +1,8 @@
-from libpathod import pathod, version
 from netlib import tcp, http
 import requests
 import tutils
+import libpathod
+import libpathod.pathod as pathod
 
 class TestPathod:
     def test_instantiation(self):
@@ -92,7 +93,7 @@ class CommonTests(tutils.DaemonTests):
         assert v[1] == 200
 
     def test_info(self):
-        assert tuple(self.d.info()["version"]) == version.IVERSION
+        assert tuple(self.d.info()["version"]) == libpathod.version.IVERSION
 
     def test_logs(self):
         assert self.d.clear_log()

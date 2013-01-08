@@ -1,6 +1,11 @@
-import json, threading, Queue
+import json, threading
 import requests
-import pathod, utils
+import libpathod
+
+try:
+    import Queue
+except ImportError:
+    import queue as Queue
 
 
 class Daemon:
@@ -71,7 +76,7 @@ class _PaThread(threading.Thread):
         self.daemonargs = daemonargs
 
     def run(self):
-        self.server = pathod.Pathod(
+        self.server = libpathod.pathod.Pathod(
             (self.iface, 0),
             ssl = self.ssl,
             **self.daemonargs

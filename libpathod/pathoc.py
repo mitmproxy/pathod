@@ -1,7 +1,8 @@
 import sys, os
 from netlib import tcp, http
 import netlib.utils
-import language, utils
+import libpathod.language as language
+import libpathod.utils as utils
 
 class PathocError(Exception): pass
 
@@ -35,7 +36,7 @@ class Pathoc(tcp.TCPClient):
         if self.ssl:
             try:
                 self.convert_to_ssl(sni=self.sni)
-            except tcp.NetLibError, v:
+            except tcp.NetLibError as v:
                 raise PathocError(str(v))
 
     def request(self, spec):
@@ -78,11 +79,11 @@ class Pathoc(tcp.TCPClient):
         """
         try:
             r = language.parse_request(self.settings, spec)
-        except language.ParseException, v:
+        except language.ParseException as v:
             print >> fp, "Error parsing request spec: %s"%v.msg
             print >> fp, v.marked()
             return
-        except language.FileAccessDenied, v:
+        except language.FileAccessDenied as v:
             print >> fp, "File access error: %s"%v
             return
 
@@ -98,7 +99,7 @@ class Pathoc(tcp.TCPClient):
             req = language.serve(r, self.wfile, self.settings, self.host)
             self.wfile.flush()
             resp = http.read_response(self.rfile, r.method, None)
-        except http.HttpError, v:
+        except http.HttpError as v:
             print >> fp, "<< HTTP Error:", v.msg
         except tcp.NetLibTimeout:
             if ignoretimeout:

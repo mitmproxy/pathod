@@ -1,6 +1,6 @@
 import tempfile, os, shutil
 from contextlib import contextmanager
-from libpathod import utils, test, pathoc, pathod
+import libpathod.utils
 import requests
 
 class DaemonTests:
@@ -13,8 +13,8 @@ class DaemonTests:
     not_after_connect = False
     @classmethod
     def setUpAll(self):
-        so = pathod.SSLOptions(not_after_connect = self.not_after_connect)
-        self.d = test.Daemon(
+        so = libpathod.pathod.SSLOptions(not_after_connect = self.not_after_connect)
+        self.d = libpathod.test.Daemon(
             staticdir=test_data.path("data"),
             anchors=[("/anchor/.*", "202:da")],
             ssl = self.ssl,
@@ -50,7 +50,7 @@ class DaemonTests:
     def pathoc(self, spec, timeout=None, connect_to=None, ssl=None):
         if ssl is None:
             ssl = self.ssl
-        c = pathoc.Pathoc("localhost", self.d.port, ssl=ssl)
+        c = libpathod.pathoc.Pathoc("localhost", self.d.port, ssl=ssl)
         c.connect(connect_to)
         if timeout:
             c.settimeout(timeout)
@@ -87,7 +87,7 @@ def raises(exc, obj, *args, **kwargs):
     """
     try:
         apply(obj, args, kwargs)
-    except Exception, v:
+    except Exception as v:
         if isinstance(exc, basestring):
             if exc.lower() in str(v).lower():
                 return
@@ -108,4 +108,4 @@ def raises(exc, obj, *args, **kwargs):
                 )
     raise AssertionError("No exception raised.")
 
-test_data = utils.Data(__name__)
+test_data = libpathod.utils.Data(__name__)
