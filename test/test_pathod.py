@@ -57,7 +57,7 @@ class TestNotAfterConnect(tutils.DaemonTests):
     not_after_connect = True
     def test_connect(self):
         v = self.pathoc(r"get:'http://foo.com/p/202':da", connect_to=("localhost", self.d.port))
-        assert v[1] == 202
+        assert v.code == 202
 
 
 class TestNohang(tutils.DaemonTests):
@@ -89,7 +89,7 @@ class CommonTests(tutils.DaemonTests):
 
     def test_preline(self):
         v = self.pathoc(r"get:'/p/200':i0,'\r\n'")
-        assert v[1] == 200
+        assert v.code == 200
 
     def test_info(self):
         assert tuple(self.d.info()["version"]) == version.IVERSION
@@ -153,14 +153,14 @@ class CommonTests(tutils.DaemonTests):
 
     def test_proxy(self):
         v = self.pathoc(r"get:'http://foo.com/p/202':da")
-        assert v[1] == 202
+        assert v.code == 202
 
 
 class TestDaemon(CommonTests):
     ssl = False
     def test_connect(self):
         v = self.pathoc(r"get:'http://foo.com/p/202':da", connect_to=("localhost", self.d.port), ssl=True)
-        assert v[1] == 202
+        assert v.code == 202
 
     def test_connect_err(self):
         tutils.raises(http.HttpError, self.pathoc, r"get:'http://foo.com/p/202':da", connect_to=("localhost", self.d.port))

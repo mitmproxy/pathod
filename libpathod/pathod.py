@@ -18,6 +18,8 @@ class SSLOptions:
 class PathodHandler(tcp.BaseHandler):
     wbufsize = 0
     sni = None
+    clientcert = None
+
     def info(self, s):
         logger.info("%s:%s: %s"%(self.client_address[0], self.client_address[1], str(s)))
 

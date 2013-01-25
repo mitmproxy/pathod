@@ -35,6 +35,10 @@ if __name__ == "__main__":
         help="Connection timeout"
     )
     parser.add_argument(
+        "-l", dest="pipeline", action='store_true', default=False,
+        help="Send requests using http pipelining"
+    )
+    parser.add_argument(
         'host', type=str,
         help='Host to connect to'
     )
@@ -121,29 +125,47 @@ if __name__ == "__main__":
     else:
         connect_to = None
 
+    def _pathoc():
+        p = pathoc.Pathoc(args.host, port, ssl=args.ssl, sni=args.sni, clientcert=args.clientcert)
+        try:
+            p.connect(connect_to)
+        except (tcp.NetLibError, pathoc.PathocError), v:
+            print >> sys.stderr, str(v)
+            sys.exit(1)
+        if args.timeout:
+            p.settimeout(args.timeout)
+        return p
+
     try:
-        for i in range(args.repeat):
-            p = pathoc.Pathoc(args.host, port, ssl=args.ssl, sni=args.sni, clientcert=args.clientcert)
-            try:
-                p.connect(connect_to)
-            except (tcp.NetLibError, pathoc.PathocError), v:
-                print >> sys.stderr, str(v)
-                sys.exit(1)
-            if args.timeout:
-                p.settimeout(args.timeout)
-            for spec in args.request:
-                ret = p.print_request(
-                    spec,
-                    showreq=args.showreq,
-                    showresp=args.showresp,
-                    explain=args.explain,
-                    hexdump=args.hexdump,
-                    ignorecodes=codes,
-                    ignoretimeout=args.ignoretimeout
-                )
-                sys.stdout.flush()
-                if ret and args.oneshot:
-                    sys.exit(0)
+        if args.pipeline:
+            p = _pathoc()
+            ret = p.print_pipelined_requests(args.request,
+                showreq=args.showreq,
+                showresp=args.showresp,
+                explain=args.explain,
+                hexdump=args.hexdump,
+                ignorecodes=codes,
+                ignoretimeout=args.ignoretimeout
+            )
+            sys.stdout.flush()
+        else:
+            for i in range(args.repeat):
+                p = _pathoc()
+
+                for spec in args.request:
+                    ret = p.print_request(
+                        spec,
+                        showreq=args.showreq,
+                        showresp=args.showresp,
+                        explain=args.explain,
+                        hexdump=args.hexdump,
+                        ignorecodes=codes,
+                        ignoretimeout=args.ignoretimeout
+                    )
+                    sys.stdout.flush()
+                    if ret and args.oneshot:
+                        sys.exit(0)
+                p.close()
     except KeyboardInterrupt:
         pass
 
