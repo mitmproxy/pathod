@@ -86,6 +86,10 @@ class PathodHandler(tcp.BaseHandler):
         self.use_http2 = False
         self.http2_framedump = http2_framedump
 
+    def send(self, data):
+        self.wfile.write(data)
+        self.wfile.flush()
+
     def handle_sni(self, connection):
         self.sni = connection.get_servername()
 

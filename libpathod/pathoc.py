@@ -211,7 +211,9 @@ class Pathoc(tcp.TCPClient):
                     "Please use OpenSSL >= 1.0.2. "
                     "Pathoc might not be working as expected without ALPN."
                 )
-            self.protocol = http2.HTTP2Protocol(self, dump_frames=self.http2_framedump)
+            self.protocol = http2.HTTP2Protocol(self,
+                dump_frames=self.http2_framedump,
+            )
         else:
             self.protocol = http1.HTTP1Protocol(self)
 
@@ -222,6 +224,10 @@ class Pathoc(tcp.TCPClient):
             request_host=self.address.host,
             protocol=self.protocol,
         )
+
+    def send(self, data):
+        self.wfile.write(data)
+        self.wfile.flush()
 
     def http_connect(self, connect_to):
         self.wfile.write(
@@ -408,7 +414,14 @@ class Pathoc(tcp.TCPClient):
                 req = language.serve(r, self.wfile, self.settings)
                 self.wfile.flush()
 
-                resp = self.protocol.read_response(req["method"], None)
+                if isinstance(self.protocol, http.http2.HTTP2Protocol):
+                    resp = self.protocol.read_response(
+                        request_method=req["method"],
+                        stream_id=r.stream_id,
+                        include_body=True,
+                    )
+                else:
+                    resp = self.protocol.read_response(req["method"])
                 resp.sslinfo = self.sslinfo
             except http.HttpError as v:
                 lg("Invalid server response: %s" % v)

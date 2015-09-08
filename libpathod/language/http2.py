@@ -193,7 +193,8 @@ class Response(_HTTP2Message):
             )
             resp.stream_id = self.stream_id
 
-            self.rendered_values = settings.protocol.assemble(resp)
+            frms = settings.protocol.assemble(resp)
+            self.rendered_values = [frm.to_bytes() for frm in frms]
             return self.rendered_values
 
     def spec(self):
@@ -280,7 +281,8 @@ class Request(_HTTP2Message):
             )
             req.stream_id = self.stream_id
 
-            self.rendered_values = settings.protocol.assemble(req)
+            frms = settings.protocol.assemble(req)
+            self.rendered_values = [frm.to_bytes() for frm in frms]
             return self.rendered_values
 
     def spec(self):
