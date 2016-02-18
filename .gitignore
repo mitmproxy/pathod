@@ -1,15 +1,4 @@
-# Python object files
 *.py[cd]
-MANIFEST
 /build
 /dist
-# Vim swap files
-*.swp
-/doc
-.coverage
-.noseids
-netlib
-venv
-.idea/
-pathod.egg-info/
-.cache/
+*.egg-info
